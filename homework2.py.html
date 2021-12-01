@@ -1,0 +1,75 @@
+<html>
+<head>
+<title>homework2.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+.s3 { color: #6897bb;}
+.s4 { color: #808080;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+homework2.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">librosa</span>
+<span class="s0">import </span><span class="s1">librosa.display</span>
+<span class="s0">import </span><span class="s1">numpy </span><span class="s0">as </span><span class="s1">np</span>
+<span class="s0">import </span><span class="s1">matplotlib.pyplot </span><span class="s0">as </span><span class="s1">plt</span>
+<span class="s0">from </span><span class="s1">sklearn.mixture </span><span class="s0">import </span><span class="s1">GaussianMixture</span>
+<span class="s0">import </span><span class="s1">os</span>
+<span class="s1">plt.rc(</span><span class="s2">'font'</span><span class="s0">, </span><span class="s1">family=</span><span class="s2">'Malgun Gothic'</span><span class="s1">)</span>
+<span class="s1">plt.rcParams[</span><span class="s2">'axes.unicode_minus'</span><span class="s1">] = </span><span class="s0">False</span>
+
+<span class="s1">files = os.listdir(</span><span class="s2">'./'</span><span class="s1">)</span>
+
+<span class="s1">student=[</span><span class="s2">'선생님'</span><span class="s0">, </span><span class="s2">'김혜영'</span><span class="s0">, </span><span class="s2">'박지윤'</span><span class="s0">, </span><span class="s2">'송주아'</span><span class="s0">, </span><span class="s2">'오세은'</span><span class="s0">, </span><span class="s2">'이다은'</span><span class="s0">,</span><span class="s2">'이인원'</span><span class="s0">, </span><span class="s2">'이혜연'</span><span class="s0">, </span><span class="s2">'정나윤'</span><span class="s0">,</span><span class="s2">'성치영'</span><span class="s1">]</span>
+
+<span class="s1">i=</span><span class="s3">0</span>
+<span class="s1">sr=</span><span class="s3">16000</span>
+<span class="s0">for </span><span class="s1">file </span><span class="s0">in </span><span class="s1">files:</span>
+    <span class="s0">if </span><span class="s2">'student' </span><span class="s0">in </span><span class="s1">file:</span>
+        <span class="s1">print(file)</span>
+        <span class="s1">i += </span><span class="s3">1</span>
+        <span class="s1">y</span><span class="s0">, </span><span class="s1">sr = librosa.load(file</span><span class="s0">, </span><span class="s1">sr=sr)</span>
+        <span class="s1">globals()[</span><span class="s2">'mfcc{}'</span><span class="s1">.format(i)]= librosa.feature.mfcc(y=y</span><span class="s0">, </span><span class="s1">sr=sr</span><span class="s0">, </span><span class="s1">n_mfcc=</span><span class="s3">24</span><span class="s0">, </span><span class="s1">hop_length=</span><span class="s3">512</span><span class="s1">)</span>
+        <span class="s1">mfccdata=globals()[</span><span class="s2">'mfcc{}'</span><span class="s1">.format(i)]</span>
+        <span class="s1">globals()[</span><span class="s2">'gmm{}'</span><span class="s1">.format(i)] = GaussianMixture(n_components=</span><span class="s3">5</span><span class="s0">, </span><span class="s1">covariance_type=</span><span class="s2">'diag'</span><span class="s0">, </span><span class="s1">tol=</span><span class="s3">0.001</span><span class="s0">, </span><span class="s1">max_iter=</span><span class="s3">200</span><span class="s0">,</span>
+                               <span class="s1">init_params=</span><span class="s2">'random'</span><span class="s1">).fit(mfccdata.T)</span>
+
+
+
+<span class="s1">testfile=</span><span class="s2">'test0.wav'</span>
+<span class="s1">yt</span><span class="s0">, </span><span class="s1">srt=librosa.load(testfile</span><span class="s0">, </span><span class="s1">sr=</span><span class="s3">8000</span><span class="s1">)</span>
+<span class="s1">mfcctest=librosa.feature.mfcc(y=yt</span><span class="s0">, </span><span class="s1">sr=srt</span><span class="s0">, </span><span class="s1">n_mfcc=</span><span class="s3">24</span><span class="s0">, </span><span class="s1">hop_length=</span><span class="s3">512</span><span class="s1">)</span>
+
+<span class="s1">p=-</span><span class="s3">100000000</span>
+<span class="s1">pval=[]</span>
+<span class="s0">for </span><span class="s1">j </span><span class="s0">in </span><span class="s1">range(</span><span class="s3">1</span><span class="s0">,</span><span class="s1">i+</span><span class="s3">1</span><span class="s1">):</span>
+    <span class="s1">gmmodel=globals()[</span><span class="s2">'gmm{}'</span><span class="s1">.format(j)]</span>
+    <span class="s1">pt=gmmodel.score(mfcctest.T)</span>
+    <span class="s1">pval.append(pt)</span>
+    <span class="s1">print(pt)</span>
+    <span class="s0">if </span><span class="s1">pt &gt; p:</span>
+        <span class="s1">p=pt</span>
+        <span class="s1">n=j-</span><span class="s3">1</span>
+
+
+<span class="s4">#결과를 위한 시각화</span>
+<span class="s1">print(student[n]+</span><span class="s2">'의 목소리일 확률은 {}으로 가장 높습니다.'</span><span class="s1">.format(round(p</span><span class="s0">,</span><span class="s3">2</span><span class="s1">)))</span>
+<span class="s1">plt.figure(dpi=</span><span class="s3">100</span><span class="s1">)</span>
+<span class="s1">plt.subplot(</span><span class="s3">3</span><span class="s0">,</span><span class="s3">1</span><span class="s0">,</span><span class="s3">1</span><span class="s1">)</span>
+<span class="s1">plt.title(student[n]+</span><span class="s2">'의 목소리일 확률은 {}으로 가장 높습니다.'</span><span class="s1">.format(round(p</span><span class="s0">,</span><span class="s3">2</span><span class="s1">)))</span>
+<span class="s1">librosa.display.specshow(globals()[</span><span class="s2">'mfcc{}'</span><span class="s1">.format(n+</span><span class="s3">1</span><span class="s1">)])</span>
+<span class="s1">plt.subplot(</span><span class="s3">3</span><span class="s0">,</span><span class="s3">1</span><span class="s0">,</span><span class="s3">2</span><span class="s1">)</span>
+<span class="s1">librosa.display.specshow(mfcctest)</span>
+<span class="s1">plt.subplot(</span><span class="s3">3</span><span class="s0">,</span><span class="s3">1</span><span class="s0">,</span><span class="s3">3</span><span class="s1">)</span>
+<span class="s1">plt.plot(student</span><span class="s0">,</span><span class="s1">pval</span><span class="s0">, </span><span class="s2">'r--o'</span><span class="s1">)</span>
+<span class="s1">plt.grid()</span>
+<span class="s1">plt.show()</span></pre>
+</body>
+</html>
